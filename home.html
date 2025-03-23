@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Service Finder</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f5f5f5;
+            font-family: Arial, sans-serif;
+        }
+        .navbar {
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .search-container {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        .service-card {
+            transition: all 0.3s ease;
+            border: none;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        }
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .service-icon {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #0d6efd;
+        }
+        .provider-card {
+            border: none;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+        .provider-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .rating {
+            color: #ffc107;
+        }
+        .footer {
+            background: #212529;
+            color: white;
+            padding: 40px 0 20px;
+            margin-top: 50px;
+        }
+        .footer h5 {
+            color: #0d6efd;
+            margin-bottom: 20px;
+        }
+        .footer ul {
+            padding-left: 0;
+            list-style: none;
+        }
+        .footer ul li {
+            margin-bottom: 10px;
+        }
+        .footer ul li a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+        }
+        .footer ul li a:hover {
+            color: white;
+        }
+        .social-icons a {
+            display: inline-block;
+            width: 36px;
+            height: 36px;
+            background-color: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            text-align: center;
+            line-height: 36px;
+            color: white;
+            margin-right: 10px;
+        }
+        .social-icons a:hover {
+            background-color: #0d6efd;
+        }
+        #searchResults {
+            margin-top: 30px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-tools me-2"></i>
+                Local Service Finder
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#services">Services</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#how-it-works">How It Works</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">Contact</a>
+                    </li>
+                    <li class="nav-item ms-2">
+                        <a class="btn btn-light" href="#">Login / Register</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="container text-center mt-5">
+        <h1 class="mb-3">Find Trusted Local Services Easily!</h1>
+        <p class="lead mb-4">We connect you with verified service professionals near you. Whether it's plumbing, electrical work, or home repairs, we got you covered.</p>
+    </div>
+
+    <!-- Search Container -->
+    <div class="container">
+        <div class="search-container">
+            <h4 class="text-center mb-4">Search for a Service</h4>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <select id="serviceType" class="form-select">
+                        <option value="">-- Select Service --</option>
+                        <option value="Plumber">🔧 Plumber</option>
+                        <option value="Electrician">⚡ Electrician</option>
+                        <option value="Mechanic">🚗 Mechanic</option>
+                        <option value="Painter">🎨 Painter</option>
+                        <option value="Carpenter">🪵 Carpenter</option>
+                        <option value="AC Technician">❄️ AC Technician</option>
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <input type="text" id="location" class="form-control" placeholder="Enter your location">
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-primary w-100" onclick="filterServices()">
+                        <i class="fas fa-search me-2"></i> Find Services
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Results (Initially Hidden) -->
+    <div id="searchResults" class="container">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="mb-3">Search Results</h3>
+                <p id="resultCount" class="text-muted"></p>
+                <div id="results" class="row"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Services Section -->
+    <section id="services" class="py-5">
+        <div class="container text-center">
+            <h2 class="mb-4">Our Services</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="service-card card h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="service-icon">
+                                <i class="fas fa-wrench"></i>
+                            </div>
+                            <h4>Plumbing Services</h4>
+                            <p class="text-muted">Fix leaks, install pipes, and maintain water systems.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="service-card card h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="service-icon">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <h4>Electrical Services</h4>
+                            <p class="text-muted">Repair wiring, install electrical systems, and ensure safety.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="service-card card h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="service-icon">
+                                <i class="fas fa-car"></i>
+                            </div>
+                            <h4>Auto Mechanics</h4>
+                            <p class="text-muted">Car repairs, servicing, and engine diagnostics.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="service-card card h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="service-icon">
+                                <i class="fas fa-paint-roller"></i>
+                            </div>
+                            <h4>Painting Services</h4>
+                            <p class="text-muted">Home and office painting, interior and exterior.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="service-card card h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="service-icon">
+                                <i class="fas fa-hammer"></i>
+                            </div>
+                            <h4>Carpentry Services</h4>
+                            <p class="text-muted">Woodwork, furniture repairs, and custom designs.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="service-card card h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="service-icon">
+                                <i class="fas fa-snowflake"></i>
+                            </div>
+                            <h4>AC & Heating</h4>
+                            <p class="text-muted">AC installation, servicing, and repairs.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="py-5 bg-light">
+        <div class="container text-center">
+            <h2 class="mb-4">How It Works</h2>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="service-icon">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <h4>Search</h4>
+                            <p class="text-muted">Enter your location and select the service you need.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="service-icon">
+                                <i class="fas fa-list-alt"></i>
+                            </div>
+                            <h4>Compare</h4>
+                            <p class="text-muted">Browse profiles, reviews, and pricing.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="service-icon">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <h4>Contact</h4>
+                            <p class="text-muted">Reach out directly to service providers.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="service-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <h4>Review</h4>
+                            <p class="text-muted">Share your experience with others.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <h2 class="mb-4">Contact Us</h2>
+                    <p class="mb-4">Have questions or need assistance? We're here to help!</p>
+                    
+                    <div class="mb-3">
+                        <h5><i class="fas fa-map-marker-alt me-2 text-primary"></i> Address</h5>
+                        <p class="text-muted">123 Service Road, Tech Park<br>Chennai, Tamil Nadu 600001</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h5><i class="fas fa-phone me-2 text-primary"></i> Phone</h5>
+                        <p class="text-muted">+91 98765 43210</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h5><i class="fas fa-envelope me-2 text-primary"></i> Email</h5>
+                        <p class="text-muted">support@localservices.com</p>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="mb-4">Send us a Message</h4>
+                            <form>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" placeholder="Your Name">
+                                </div>
+                                <div class="mb-3">
+                                    <input type="email" class="form-control" placeholder="Your Email">
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" placeholder="Subject">
+                                </div>
+                                <div class="mb-3">
+                                    <textarea class="form-control" rows="4" placeholder="Your Message"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Send Message</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5>Local Service Finder</h5>
+                    <p>Connecting you with trusted local service professionals since 2023.</p>
+                    <div class="social-icons mt-3">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 mb-4">
+                    <h5>Quick Links</h5>
+                    <ul>
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#services">Services</a></li>
+                        <li><a href="#how-it-works">How It Works</a></li>
+                        <li><a href="#contact">Contact Us</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-md-4 mb-4">
+                    <h5>Services</h5>
+                    <ul>
+                        <li><a href="#">Plumbing</a></li>
+                        <li><a href="#">Electrical</a></li>
+                        <li><a href="#">Carpentry</a></li>
+                        <li><a href="#">Painting</a></li>
+                        <li><a href="#">AC & Heating</a></li>
+                        <li><a href="#">Automotive</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="text-center pt-3 mt-3 border-top border-secondary">
+                <p>&copy; 2025 Local Service Finder. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const services = [
+            { name: "ABC Plumbers", type: "Plumber", contact: "9876543210", location: "Chennai", rating: 4.8, reviews: 125 },
+            { name: "XYZ Electricians", type: "Electrician", contact: "9876543211", location: "Coimbatore", rating: 4.6, reviews: 98 },
+            { name: "LMN Mechanics", type: "Mechanic", contact: "9876543212", location: "Madurai", rating: 4.7, reviews: 112 },
+            { name: "PQR Plumbers", type: "Plumber", contact: "9876543213", location: "Salem", rating: 4.5, reviews: 87 },
+            { name: "DEF Painters", type: "Painter", contact: "9876543214", location: "Chennai", rating: 4.9, reviews: 76 },
+            { name: "GHI Carpenters", type: "Carpenter", contact: "9876543215", location: "Trichy", rating: 4.4, reviews: 65 },
+            { name: "JKL AC Services", type: "AC Technician", contact: "9876543216", location: "Coimbatore", rating: 4.8, reviews: 92 },
+            { name: "MNO Mechanics", type: "Mechanic", contact: "9876543217", location: "Erode", rating: 4.6, reviews: 78 },
+            { name: "PST Electricians", type: "Electrician", contact: "9876543218", location: "Tirunelveli", rating: 4.7, reviews: 84 }
+        ];
+        
+        function filterServices() {
+            let selectedType = document.getElementById("serviceType").value;
+            let enteredLocation = document.getElementById("location").value.toLowerCase();
+            
+            let results = services.filter(service => 
+                (selectedType === "" || service.type === selectedType) && 
+                (enteredLocation === "" || service.location.toLowerCase().includes(enteredLocation))
+            );
+            
+            // Display search results section
+            document.getElementById("searchResults").style.display = "block";
+            
+            document.getElementById("resultCount").innerText = `Found ${results.length} service providers`;
+            
+            let output = "";
+            if (results.length === 0) {
+                output = "<div class='col-12 text-center'><p class='text-danger'>No services found matching your criteria.</p></div>";
+            } else {
+                results.forEach(service => {
+                    let icon = service.type === "Plumber" ? "🔧" : 
+                               service.type === "Electrician" ? "⚡" : 
+                               service.type === "Mechanic" ? "🚗" : 
+                               service.type === "Painter" ? "🎨" : 
+                               service.type === "Carpenter" ? "🪵" : "❄️";
+                               
+                    let stars = "";
+                    for (let i = 1; i <= 5; i++) {
+                        if (i <= Math.floor(service.rating)) {
+                            stars += '<i class="fas fa-star text-warning"></i>';
+                        } else if (i === Math.ceil(service.rating) && !Number.isInteger(service.rating)) {
+                            stars += '<i class="fas fa-star-half-alt text-warning"></i>';
+                        } else {
+                            stars += '<i class="far fa-star text-warning"></i>';
+                        }
+                    }
+                    
+                    output += `
+                        <div class='col-md-4'>
+                            <div class='provider-card card mb-4'>
+                                <div class='card-header bg-primary text-white'>
+                                    <h5 class='mb-0'>${icon} ${service.name}</h5>
+                                </div>
+                                <div class='card-body'>
+                                    <p class='mb-2'><i class='fas fa-map-marker-alt text-secondary me-2'></i>${service.location}</p>
+                                    <p class='mb-2'><i class='fas fa-phone text-secondary me-2'></i>${service.contact}</p>
+                                    <p class='mb-2'>${stars} <span class="text-muted">(${service.reviews} reviews)</span></p>
+                                    <div class='d-grid gap-2 mt-3'>
+                                        <a href='tel:${service.contact}' class='btn btn-primary'><i class='fas fa-phone me-2'></i>Call Now</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            document.getElementById("results").innerHTML = output;
+            
+            // Scroll to search results
+            document.getElementById('searchResults').scrollIntoView({behavior: 'smooth'});
+        }
+    </script>
+</body>
+</html>
